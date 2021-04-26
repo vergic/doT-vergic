@@ -4,6 +4,16 @@ var test = require('./util').test;
 var assert = require("assert")
 var doT = require("..");
 
+var _globals = (function(){ return this || (0,eval)("this"); }());
+var fn = function(){};
+
+function encodeHTMLFunctionGenerator(doNotSkipEncoded) {
+	var encodeHTMLRules = { "&": "&#38;", "<": "&#60;", ">": "&#62;", '"': "&#34;", "'": "&#39;", "/": "&#47;" },
+		matchHTML = doNotSkipEncoded ? /[&<>"'\/]/g : /&(?!#?\w+;)|<|>|"|'|\//g;
+	return function(code) {
+		return code ? code.toString().replace(matchHTML, function(m) {return encodeHTMLRules[m] || m;}) : "";
+	};
+}
 
 describe('doT', function(){
 	var basictemplate = "<div>{{!it.foo}}</div>";
@@ -14,7 +24,7 @@ describe('doT', function(){
 			assert.strictEqual(doT.name, 'doT');
 		});
 	});
-	
+
 	describe('#template()', function(){
 		it('should return a function', function(){
 			assert.equal(typeof basiccompiled, "function");
@@ -71,6 +81,34 @@ describe('doT', function(){
 			assert.throws(function() {
 				var fn = doT.template('<div>{{= foo + }}</div>');
 			});
+		});
+	});
+
+	describe('using global encodeHTML function', function() {
+		it('should generate function without encodeHTML()-function', function() {
+			var settings = Object.assign({}, doT.templateSettings, {
+				globalEncodeHTMLFnName: '_myEncodeHTML',
+				selfcontained: false,
+				doNotSkipEncoded: true
+			});
+
+			fn = doT.template('<div>{{!it.foo}}</div>',settings);
+			assert.equal(fn.toString(),"function anonymous(it\n" +
+				") {\n" +
+				"var out='<div>'+_myEncodeHTML(it.foo)+'</div>';return out;\n" +
+				"}");
+		});
+
+		it('should render correct html with doNotSkipEncoded = false', function() {
+			delete _globals._encodeHTML;
+			_globals._myEncodeHTML = encodeHTMLFunctionGenerator(false);
+			assert.equal(fn({foo:"&amp;"}),"<div>&amp;</div>");
+		});
+
+		it('should render correct html with doNotSkipEncoded = true', function() {
+			delete _globals._encodeHTML;
+			_globals._myEncodeHTML = encodeHTMLFunctionGenerator(true);
+			assert.equal(fn({foo:"&amp;"}),"<div>&#38;amp;</div>");
 		});
 	});
 });

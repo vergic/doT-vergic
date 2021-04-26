@@ -3,10 +3,11 @@
 Created in search of the fastest and concise JavaScript templating function with emphasis on performance under V8 and nodejs. It shows great performance for both nodejs and browsers.
 
 doT.js is fast, small and has no dependencies.
-
+<!---
 [![Build Status](https://travis-ci.org/olado/doT.svg?branch=v2)](https://travis-ci.org/olado/doT)
 [![npm version](https://img.shields.io/npm/v/dot/beta.svg)](https://www.npmjs.com/package/dot)
 [![Coverage Status](http://coveralls.io/repos/github/olado/doT/badge.svg?branch=v2)](https://coveralls.io/github/olado/doT?branch=v2)
+-->
 
 ## v2 !!!
 
@@ -47,6 +48,9 @@ It’s a race car of templating engines - doT lacks bells and whistles that othe
 ## Docs, live playground and samples
 
 http://olado.github.com/doT (todo: update docs with new features added in version 1.0.0)
+
+## Added in vergic-doT
+Possibility to skip generating an encodeHTML()-function in *every* template function. Instead specify a function name for a globally defined encodeHTML()-function with the templateSetting "globalEncodeHTMLFnName"
 
 ## New in version 1.0.0
 

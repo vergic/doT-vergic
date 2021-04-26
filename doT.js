@@ -22,13 +22,15 @@
 			strip:		true,
 			append:		true,
 			selfcontained: false,
-			doNotSkipEncoded: false
+			doNotSkipEncoded: false,
+			globalEncodeHTMLFnName: false
 		},
 		template: undefined, //fn, compile template
 		compile:  undefined, //fn, for express
 		log: true
 	}, _globals;
 
+	/* istanbul ignore next */
 	doT.encodeHTMLSource = function(doNotSkipEncoded) {
 		var encodeHTMLRules = { "&": "&#38;", "<": "&#60;", ">": "&#62;", '"': "&#34;", "'": "&#39;", "/": "&#47;" },
 			matchHTML = doNotSkipEncoded ? /[&<>"'\/]/g : /&(?!#?\w+;)|<|>|"|'|\//g;
@@ -91,6 +93,15 @@
 
 	doT.template = function(tmpl, c, def) {
 		c = c || doT.templateSettings;
+		if (!c.selfcontained && c.globalEncodeHTMLFnName) {
+			// startend need to be redefined to use [c.globalEncodeHTMLFnName] instead of default
+			// I.e. the caller *promises* that the global function [c.globalEncodeHTMLFnName] exists
+			startend = {
+				append: {start: "'+(", end: ")+'", startencode: "'+" + c.globalEncodeHTMLFnName + "("},
+				split: {start: "';out+=(", end: ");out+='", startencode: "';out+=" + c.globalEncodeHTMLFnName + "("}
+			};
+		}
+
 		var cse = c.append ? startend.append : startend.split, needhtmlencode, sid = 0, indv,
 			str  = (c.use || c.define) ? resolveDefs(c, tmpl, def || {}) : tmpl;
 
@@ -123,7 +134,7 @@
 			.replace(/(\s|;|\}|^|\{)out\+='';/g, '$1').replace(/\+''/g, "");
 			//.replace(/(\s|;|\}|^|\{)out\+=''\+/g,'$1out+=');
 
-		if (needhtmlencode) {
+		if (needhtmlencode && (!c.globalEncodeHTMLFnName || c.selfcontained)) {
 			if (!c.selfcontained && _globals && !_globals._encodeHTML) _globals._encodeHTML = doT.encodeHTMLSource(c.doNotSkipEncoded);
 			str = "var encodeHTML = typeof _encodeHTML !== 'undefined' ? _encodeHTML : ("
 				+ doT.encodeHTMLSource.toString() + "(" + (c.doNotSkipEncoded || '') + "));"

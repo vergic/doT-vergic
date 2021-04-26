@@ -7,7 +7,6 @@ parserOptions:
   ecmaVersion: 5
 rules:
   no-trailing-spaces: 2
-  linebreak-style: [ 2, unix ]
   semi: [ 2, always ]
   valid-jsdoc: [ 2, { requireReturn: false } ]
   no-unused-vars: [ 2, { args: none } ]
