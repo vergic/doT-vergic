@@ -13,8 +13,8 @@
   "bin": {
     "dottojs": "./bin/dot-packer"
   },
-  "homepage": "http://github.com/olado/doT",
-  "repository": "git://github.com/olado/doT.git",
+  "homepage": "https://github.com/vergic/doT-vergic",
+  "repository": "git://github.com/vergic/doT-vergic.git",
   "author": "Laura Doktorova <ldoktorova@gmail.com>",
   "engines": [
     "node >=0.2.6"
